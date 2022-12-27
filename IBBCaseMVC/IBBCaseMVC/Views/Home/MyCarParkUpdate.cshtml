@@ -1,0 +1,37 @@
+﻿@model IBBCaseMVC.Models.CarPark
+
+@{
+    ViewData["Title"] = "MyCarParkUpdate";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h3 class="tittle">Otopark Düzenle</h3>
+<section class="main-content-w3layouts-agileits">
+    <div class="container">
+        <div class="row inner-sec">
+            <div class="login p-5 bg-light mx-auto mw-100">
+                <form asp-action="MyCarParkUpdate">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input asp-for="CarParkId" class="form-control" type="hidden" />
+                    <input asp-for="_id" class="form-control"  type="hidden" />
+                    <div class="form-group">
+                        <label asp-for="PARK_NAME" class="control-label"></label>
+                        <input asp-for="PARK_NAME" class="form-control" />
+                        <span asp-validation-for="PARK_NAME" class="text-danger"></span>
+                    </div>
+                    <input asp-for="LOCATION_NAME" class="form-control"  type="hidden" />
+                    <input asp-for="PARK_TYPE_ID" class="form-control"  type="hidden" />
+                    <input asp-for="PARK_TYPE_DESC" class="form-control"  type="hidden" />
+                    <input asp-for="CAPACITY_OF_PARK" class="form-control" type="hidden"  />
+                    <input asp-for="WORKING_TIME" class="form-control" type="hidden"  />
+                    <input asp-for="COUNTY_NAME" class="form-control"  type="hidden" />
+                    <input asp-for="LONGITUDE" class="form-control"  type="hidden" />
+                    <input asp-for="LATITUDE" class="form-control" type="hidden"  />
+                    <div class="form-group">
+                        <input type="submit" value="Kaydet" class="btn btn-success btn-sm my-2 mx-2" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>

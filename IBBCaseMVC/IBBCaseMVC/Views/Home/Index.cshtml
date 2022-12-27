@@ -1,0 +1,424 @@
+﻿@model AllCarParkViewModel
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<style>
+    #map {
+        height: 100%;
+        width: 100%;
+    }
+</style>
+
+<div id="map" class="my-4" style="height: 790px"></div>
+
+
+<script>
+        let map;
+
+       function initMap() 
+{
+             map = new google.maps.Map(document.getElementById("map"), {
+             center: { lat: 41.0495232987717031, lng: 28.9955656052444013 },
+             zoom: 10,
+       });
+                  const styledMapType = new google.maps.StyledMapType([
+  {
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#ebe3cd"
+      }
+    ]
+  },
+  {
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#523735"
+      }
+    ]
+  },
+  {
+    "elementType": "labels.text.stroke",
+    "stylers": [
+      {
+        "color": "#f5f1e6"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "color": "#c9b2a6"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.land_parcel",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "color": "#dcd2be"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.land_parcel",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#ae9e90"
+      }
+    ]
+  },
+  {
+    "featureType": "landscape.natural",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#dfd2ae"
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#dfd2ae"
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#93817c"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "geometry.fill",
+    "stylers": [
+      {
+        "color": "#a5b076"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#447530"
+      }
+    ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#f5f1e6"
+      }
+    ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "labels.icon",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "road.arterial",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#fdfcf8"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#f8c967"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "color": "#e9bc62"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway.controlled_access",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#e98d58"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway.controlled_access",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "color": "#db8555"
+      }
+    ]
+  },
+  {
+    "featureType": "road.local",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#806b63"
+      }
+    ]
+  },
+  {
+    "featureType": "transit",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.line",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#dfd2ae"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.line",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#8f7d77"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.line",
+    "elementType": "labels.text.stroke",
+    "stylers": [
+      {
+        "color": "#ebe3cd"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.station",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#dfd2ae"
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "geometry.fill",
+    "stylers": [
+      {
+        "color": "#b9d3c2"
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#92998d"
+      }
+    ]
+  }
+]);
+
+
+
+        var marker=[];
+        var markerCluster
+        var contentString=[];
+        var infowindow=[];
+        var markers=[];
+        var currentInfoWindow = null;
+    @foreach (var item in Model.MyCarPark)
+    {
+        <text>
+          var svgMarker = {
+          path: "M10.453 14.016l6.563-6.609-1.406-1.406-5.156 5.203-2.063-2.109-1.406 1.406zM12 2.016q2.906 0 4.945 2.039t2.039 4.945q0 1.453-0.727 3.328t-1.758 3.516-2.039 3.070-1.711 2.273l-0.75 0.797q-0.281-0.328-0.75-0.867t-1.688-2.156-2.133-3.141-1.664-3.445-0.75-3.375q0-2.906 2.039-4.945t4.945-2.039z",
+          fillColor: "green",
+          fillOpacity: 0.9,
+          strokeWeight: 0,
+          rotation: 0,
+          scale: 2,
+          anchor: new google.maps.Point(15, 30),
+        };
+
+                        marker[@item._id] = new google.maps.Marker({
+                            map: map,
+                            position: { lat: @item.LATITUDE.ToString().Replace(",","."), lng: @item.LONGITUDE.ToString().Replace(",",".") },
+                             icon: svgMarker,
+
+                       });
+                           contentString[@item._id] = '<h5 class="my-2" id="firstHeading" class="firstHeading">@item.PARK_NAME.ToUpper()</h5>' +
+                                          '<table class="table table-success table-striped">' +
+                                                 ' <thead>' +
+                                                    '  <tr>' +
+                                                       '   <th>Lokasyon</th>' +
+                                                       '   <td>@item.LOCATION_NAME</td>' +
+                                                     ' <tr>' +
+                                                      '    <th>İlçe</th>' +
+                                                    '      <td>@item.COUNTY_NAME</td>' +
+                                                    '  <tr>' +
+                                                     '     <th>Otopark Kapasitesi</th>' +
+                                                     '     <td>@item.CAPACITY_OF_PARK</td>' +
+                                                     ' <tr>' +
+                                                   '       <th>Çalışma Saatleri</th>' +
+                                                   '       <td>@item.WORKING_TIME</td>' +
+                                                   '   <tr>' +
+                                                     '     <th>Park Türü</th>' +
+                                                    '      <td>@item.PARK_TYPE_DESC</td>' +
+                                                    '  <tr>' +
+                                                 ' </thead>' +
+                                             ' </table>' +
+                                       '<form asp-action="MyCarParkDelete" asp-controller="Home" method="post" style="display: inline">' +
+                                          '<input type="hidden" name="id" value="@item.CarParkId">' +
+                                          '<button type="submit" class="btn btn-danger btn-sm my-2 mx-2">Kaldır</button>' +
+                                      '</form>'+
+                                         '<form asp-action="MyCarParkUpdate" asp-controller="Home" method="get" style="display: inline">' +
+                                                  '<input type="hidden" name="id" value="@item.CarParkId">' +
+                                                  '<button type="submit" class="btn btn-warning btn-sm my-2 mx-2">Düzenle</button>' +
+                                              '</form>';
+
+                       infowindow[@item._id] = new google.maps.InfoWindow({
+                            content: contentString[@item._id]
+                      });
+
+                      marker[@item._id].addListener("click", function () {
+                                 if (currentInfoWindow != null) {
+                                        currentInfoWindow.close();
+                                        }
+                                     infowindow[@item._id].open(map,marker[@item._id]);
+                                     currentInfoWindow= infowindow[@item._id];
+                                     
+                              });
+                       markers.push(marker[@item._id]);
+        </text>
+    }
+
+    @foreach (var item in Model.AllCarPark)
+    {
+        <text>
+                        marker[@item._id] = new google.maps.Marker({
+                            map: map,
+                            position: { lat: @item.LATITUDE.ToString().Replace(",","."), lng: @item.LONGITUDE.ToString().Replace(",",".") },
+
+                       });
+                                             
+
+                        contentString[@item._id] = '<h5 class="my-2" id="firstHeading" class="firstHeading">@item.PARK_NAME.ToUpper()</h5>' +
+                                          '<table class="table table-success table-striped">' +
+                                                 ' <thead>' +
+                                                    '  <tr>' +
+                                                       '   <th>Lokasyon</th>' +
+                                                       '   <td>@item.LOCATION_NAME</td>' +
+                                                     ' <tr>' +
+                                                      '    <th>İlçe</th>' +
+                                                    '      <td>@item.COUNTY_NAME</td>' +
+                                                    '  <tr>' +
+                                                     '     <th>Otopark Kapasitesi</th>' +
+                                                     '     <td>@item.CAPACITY_OF_PARK</td>' +
+                                                     ' <tr>' +
+                                                   '       <th>Çalışma Saatleri</th>' +
+                                                   '       <td>@item.WORKING_TIME</td>' +
+                                                   '   <tr>' +
+                                                     '     <th>Park Türü</th>' +
+                                                    '      <td>@item.PARK_TYPE_DESC</td>' +
+                                                    '  <tr>' +
+                                                 ' </thead>' +
+                                             ' </table>' +
+                                           '<form asp-action="AddMyCarPark" asp-controller="Home" method="post" style="display: inline">' +
+                                          '<input type="hidden" name="_id" value="@item._id">' +
+                                          '<input type="hidden" name="PARK_NAME" value="@item.PARK_NAME">' +
+                                          '<input type="hidden" name="LOCATION_NAME" value="@item.LOCATION_NAME">' +
+                                          '<input type="hidden" name="PARK_TYPE_ID" value="@item.PARK_TYPE_ID">' +
+                                          '<input type="hidden" name="PARK_TYPE_DESC" value="@item.PARK_TYPE_DESC">' +
+                                          '<input type="hidden" name="CAPACITY_OF_PARK" value="@item.CAPACITY_OF_PARK">' +
+                                          '<input type="hidden" name="WORKING_TIME" value="@item.WORKING_TIME">' +
+                                          '<input type="hidden" name="COUNTY_NAME" value="@item.COUNTY_NAME">' +
+                                          '<input type="hidden" name="LONGITUDE" value="@item.LONGITUDE">' +
+                                          '<input type="hidden" name="LATITUDE" value="@item.LATITUDE">' +
+                                          '<button  type="submit" class="btn btn-success btn-sm my-2 mx-2">Ekle</button>' +
+                                      '</form>' ;
+
+                       infowindow[@item._id] = new google.maps.InfoWindow({
+                            content: contentString[@item._id]
+                      });
+
+                      marker[@item._id].addListener("click", function () {
+                                 if (currentInfoWindow != null) {
+                                        currentInfoWindow.close();
+                                        }
+                                     infowindow[@item._id].open(map,marker[@item._id]);
+                                     currentInfoWindow= infowindow[@item._id];
+                                     
+                              });
+                       markers.push(marker[@item._id]);
+        </text>
+    }
+
+    var mcOptions = {gridSize: 80, maxZoom: 100};
+
+    map.mapTypes.set("styled_map", styledMapType);
+  map.setMapTypeId("styled_map");
+
+    var markerCluster = new MarkerClusterer(map, markers, mcOptions);} 
+
+    window.initMap = initMap;
+
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=APIKey&callback=initMap&v=weekly"
+        defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gmaps-marker-clusterer/1.2.2/markerclusterer.js"></script>
